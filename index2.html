@@ -1,0 +1,2480 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartAid UPI - AI-Powered Crisis Relief</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/@babel/standalone/babel.min.js"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap");
+
+      * {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        box-sizing: border-box;
+      }
+
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      :root {
+        --bg-primary: #0d0f17;
+        --bg-secondary: #151825;
+        --bg-tertiary: #1d2030;
+        --accent-primary: #2563eb;
+        --accent-secondary: #3b82f6;
+        --accent-gradient: linear-gradient(135deg, #2563eb, #7c3aed);
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-tertiary: #94a3b8;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --border: #334155;
+      }
+
+      body {
+        background: var(--bg-primary);
+        overflow-x: hidden;
+        color: var(--text-primary);
+      }
+
+      .gradient-bg {
+        background: linear-gradient(
+          135deg,
+          #0d0f17 0%,
+          #1e293b 50%,
+          #0f172a 100%
+        );
+        position: relative;
+      }
+
+      .gradient-bg::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+            600px circle at 20% 20%,
+            rgba(37, 99, 235, 0.15),
+            transparent 40%
+          ),
+          radial-gradient(
+            500px circle at 80% 80%,
+            rgba(124, 58, 237, 0.15),
+            transparent 40%
+          );
+      }
+
+      .glass {
+        background: rgba(21, 24, 37, 0.7);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--border);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+
+      .glass-light {
+        background: rgba(29, 32, 48, 0.6);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--border);
+      }
+
+      .glass-strong {
+        background: rgba(21, 24, 37, 0.9);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--border);
+      }
+
+      .card-3d {
+        transform-style: preserve-3d;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        perspective: 1000px;
+      }
+
+      .card-3d:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      }
+
+      .btn-3d {
+        position: relative;
+        transform-style: preserve-3d;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
+        background: var(--accent-gradient);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      }
+
+      .btn-3d:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+      }
+
+      .btn-3d:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(40px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 rgba(37, 99, 235, 0.4);
+        }
+        50% {
+          transform: scale(1.02);
+          box-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
+        }
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes confetti {
+        0% {
+          transform: translateY(0) rotate(0);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(100vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+
+      .floating {
+        animation: float 6s ease-in-out infinite;
+      }
+      .slide-up {
+        animation: slideUp 0.6s ease-out;
+      }
+      .slide-in {
+        animation: slideIn 0.6s ease-out;
+      }
+      .pulse {
+        animation: pulse 3s ease-in-out infinite;
+      }
+      .spin {
+        animation: spin 20s linear infinite;
+      }
+      .fade-in {
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      .input-glass {
+        background: rgba(29, 32, 48, 0.5);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--border);
+        transition: all 0.2s ease;
+        color: var(--text-primary);
+      }
+
+      .input-glass:focus {
+        background: rgba(29, 32, 48, 0.7);
+        border: 1px solid var(--accent-primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        outline: none;
+      }
+
+      .status-success {
+        background: var(--success);
+        color: white;
+      }
+
+      .status-pending {
+        background: var(--warning);
+        color: white;
+      }
+
+      .status-failed {
+        background: var(--danger);
+        color: white;
+      }
+
+      .data-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+
+      .stat-card {
+        background: var(--bg-tertiary);
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid var(--border);
+      }
+
+      .trading-panel {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .trading-header {
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border);
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-primary);
+      }
+
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-top: 2px solid var(--accent-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 1.5rem;
+      }
+
+      .col-span-3 {
+        grid-column: span 3;
+      }
+      .col-span-4 {
+        grid-column: span 4;
+      }
+      .col-span-5 {
+        grid-column: span 5;
+      }
+      .col-span-6 {
+        grid-column: span 6;
+      }
+      .col-span-7 {
+        grid-column: span 7;
+      }
+      .col-span-8 {
+        grid-column: span 8;
+      }
+      .col-span-9 {
+        grid-column: span 9;
+      }
+      .col-span-12 {
+        grid-column: span 12;
+      }
+
+      @media (max-width: 1280px) {
+        .dashboard-grid {
+          grid-template-columns: repeat(1, 1fr);
+        }
+
+        .col-span-3,
+        .col-span-4,
+        .col-span-5,
+        .col-span-6,
+        .col-span-7,
+        .col-span-8,
+        .col-span-9,
+        .col-span-12 {
+          grid-column: span 1;
+        }
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .data-table th {
+        text-align: left;
+        padding: 0.75rem 1rem;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border);
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+
+      .data-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+      }
+
+      .data-table tr:hover {
+        background: rgba(37, 99, 235, 0.05);
+      }
+
+      .mini-chart {
+        height: 40px;
+        background: linear-gradient(90deg, var(--accent-primary), transparent);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .mini-chart::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(37, 99, 235, 0.3) 100%
+        );
+        animation: chartAnimation 3s ease-in-out infinite;
+      }
+
+      @keyframes chartAnimation {
+        0%,
+        100% {
+          transform: translateX(-100%);
+        }
+        50% {
+          transform: translateX(100%);
+        }
+      }
+
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: var(--bg-secondary);
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
+
+      .graph-container {
+        width: 100%;
+        height: 300px;
+        background: var(--bg-tertiary);
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .graph-tooltip {
+        position: absolute;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .transaction-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+      }
+
+      .logo-text {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-weight: 800;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background: linear-gradient(45deg, #3b82f6, #8b5cf6, #10b981, #f59e0b);
+        opacity: 0;
+        z-index: 1000;
+        pointer-events: none;
+      }
+
+      .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        padding: 16px 20px;
+        border-radius: 12px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        max-width: 350px;
+        transform: translateX(100%);
+        transition: transform 0.3s ease-out;
+      }
+
+      .notification.show {
+        transform: translateX(0);
+      }
+
+      .notification.success {
+        border-left: 4px solid var(--success);
+      }
+
+      .notification.info {
+        border-left: 4px solid var(--accent-primary);
+      }
+
+      .notification.warning {
+        border-left: 4px solid var(--warning);
+      }
+
+      .notification-icon {
+        font-size: 20px;
+      }
+
+      .notification.success .notification-icon {
+        color: var(--success);
+      }
+
+      .notification.info .notification-icon {
+        color: var(--accent-primary);
+      }
+
+      .notification.warning .notification-icon {
+        color: var(--warning);
+      }
+
+      .notification-content {
+        flex: 1;
+      }
+
+      .notification-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+        font-size: 14px;
+      }
+
+      .notification-message {
+        font-size: 13px;
+        color: var(--text-secondary);
+      }
+
+      .close-notification {
+        background: none;
+        border: none;
+        color: var(--text-tertiary);
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .zoom-controls {
+        position: absolute;
+        bottom: 16px;
+        left: 16px;
+        display: flex;
+        gap: 8px;
+        z-index: 10;
+      }
+
+      .zoom-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .zoom-btn:hover {
+        background: var(--accent-primary);
+      }
+
+      .landing-container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .feature-card {
+        transition: all 0.3s ease;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .page-transition {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.4s ease;
+      }
+
+      .page-transition.active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .premium-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(13, 15, 23, 0.95);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+      }
+
+      .premium-modal {
+        background: var(--bg-secondary);
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        max-width: 500px;
+        width: 90%;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        position: relative;
+      }
+
+      .premium-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+      }
+
+      .premium-icon i {
+        font-size: 2rem;
+        color: white;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen gradient-bg">
+    <div id="root" class="relative z-10"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+
+      function Notification({
+        type,
+        title,
+        message,
+        onClose,
+        duration = 5000,
+      }) {
+        const [show, setShow] = useState(false);
+
+        useEffect(() => {
+          const showTimer = setTimeout(() => setShow(true), 100);
+
+          const closeTimer = setTimeout(() => {
+            setShow(false);
+            setTimeout(onClose, 300);
+          }, duration);
+
+          return () => {
+            clearTimeout(showTimer);
+            clearTimeout(closeTimer);
+          };
+        }, [duration, onClose]);
+
+        const iconClass = {
+          success: "fa-solid fa-check-circle",
+          info: "fa-solid fa-info-circle",
+          warning: "fa-solid fa-exclamation-triangle",
+        }[type];
+
+        return (
+          <div className={`notification ${type} ${show ? "show" : ""}`}>
+            <i className={`notification-icon ${iconClass}`}></i>
+            <div className="notification-content">
+              <div className="notification-title">{title}</div>
+              <div className="notification-message">{message}</div>
+            </div>
+            <button
+              className="close-notification"
+              onClick={() => {
+                setShow(false);
+                setTimeout(onClose, 300);
+              }}
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        );
+      }
+
+      function ConfettiAnimation() {
+        useEffect(() => {
+          const confettiCount = 100;
+          const container = document.createElement("div");
+          container.style.position = "fixed";
+          container.style.top = "0";
+          container.style.left = "0";
+          container.style.width = "100%";
+          container.style.height = "100%";
+          container.style.pointerEvents = "none";
+          container.style.zIndex = "1000";
+
+          document.body.appendChild(container);
+
+          for (let i = 0; i < confettiCount; i++) {
+            const confetti = document.createElement("div");
+            confetti.className = "confetti";
+            confetti.style.left = Math.random() * 100 + "vw";
+            confetti.style.animation = `confetti ${
+              Math.random() * 3 + 2
+            }s ease-out forwards`;
+            confetti.style.animationDelay = Math.random() * 2 + "s";
+            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+            confetti.style.width = Math.random() * 10 + 5 + "px";
+            confetti.style.height = Math.random() * 10 + 5 + "px";
+
+            container.appendChild(confetti);
+          }
+
+          setTimeout(() => {
+            document.body.removeChild(container);
+          }, 5000);
+
+          return () => {
+            if (document.body.contains(container)) {
+              document.body.removeChild(container);
+            }
+          };
+        }, []);
+
+        return null;
+      }
+
+      const WalletIcon = () => (
+        <i className="fa-solid fa-wallet text-blue-400"></i>
+      );
+
+      const SendIcon = () => (
+        <i className="fa-solid fa-paper-plane text-blue-400"></i>
+      );
+
+      const ClockIcon = () => (
+        <i className="fa-regular fa-clock text-blue-400"></i>
+      );
+
+      const TrendingUpIcon = () => (
+        <i className="fa-solid fa-chart-line text-blue-400"></i>
+      );
+
+      const ShieldCheckIcon = () => (
+        <i className="fa-solid fa-shield-halved text-blue-400"></i>
+      );
+
+      const ZapIcon = () => <i className="fa-solid fa-bolt text-blue-400"></i>;
+
+      const ActivityIcon = () => (
+        <i className="fa-solid fa-wave-square text-blue-400"></i>
+      );
+
+      const NetworkIcon = () => (
+        <i className="fa-solid fa-network-wired text-blue-400"></i>
+      );
+
+      function Card3D({ children, className = "", ...props }) {
+        return (
+          <div className={`card-3d glass rounded-xl ${className}`} {...props}>
+            {children}
+          </div>
+        );
+      }
+
+      function Button3D({
+        children,
+        className = "",
+        loading = false,
+        ...props
+      }) {
+        return (
+          <button
+            className={`btn-3d relative overflow-hidden px-5 py-2.5 rounded-lg font-medium transition-all duration-300 flex items-center justify-center space-x-2 ${className}`}
+            {...props}
+          >
+            {loading && <div className="spinner"></div>}
+            {children}
+          </button>
+        );
+      }
+
+      function StatCard({ title, value, change, icon, className = "" }) {
+        return (
+          <div className={`stat-card ${className}`}>
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <p className="text-sm text-text-tertiary">{title}</p>
+                <p className="text-2xl font-bold">{value}</p>
+              </div>
+              <div className="p-2 rounded-md bg-bg-secondary">{icon}</div>
+            </div>
+            {change && (
+              <div
+                className={`text-xs ${
+                  change.startsWith("+") ? "text-green-400" : "text-red-400"
+                }`}
+              >
+                {change}
+              </div>
+            )}
+            <div className="mini-chart mt-2 rounded"></div>
+          </div>
+        );
+      }
+
+      function TransactionModal({ transaction, onClose }) {
+        if (!transaction) return null;
+
+        return (
+          <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="p-6 border-b border-gray-700 flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Transaction Details</h3>
+                <button
+                  onClick={onClose}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Amount:</span>
+                  <span className="font-medium">{transaction.amount} USDC</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Status:</span>
+                  <span
+                    className={`px-2 py-1 rounded text-xs ${
+                      transaction.status === "completed"
+                        ? "bg-green-500"
+                        : transaction.status === "pending"
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
+                    }`}
+                  >
+                    {transaction.status}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Date:</span>
+                  <span className="font-medium">
+                    {new Date(transaction.timestamp).toLocaleString()}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-gray-400 mb-2">Recipient:</p>
+                  <p className="font-mono bg-gray-800 p-2 rounded">
+                    {transaction.recipient}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-400 mb-2">Transaction ID:</p>
+                  <p className="font-mono bg-gray-800 p-2 rounded">
+                    {transaction.txId}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function TradingGraph({ isExpanded, onToggleExpand }) {
+        const canvasRef = useRef(null);
+        const [zoom, setZoom] = useState(1);
+        const [offset, setOffset] = useState(0);
+
+        useEffect(() => {
+          const canvas = canvasRef.current;
+          const ctx = canvas.getContext("2d");
+
+          const drawGraph = () => {
+            const width = canvas.width;
+            const height = canvas.height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const data = [];
+            let value = 150;
+            for (let i = 0; i < 200; i++) {
+              const change = (Math.random() - 0.48) * 8;
+              value += change;
+              value = Math.max(10, value);
+              data.push(value);
+            }
+
+            const max = Math.max(...data);
+            const min = Math.min(...data);
+            const range = max - min;
+
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.lineWidth = 1;
+
+            for (let i = 0; i <= 5; i++) {
+              const y = (i / 5) * height;
+              ctx.beginPath();
+              ctx.moveTo(0, y);
+              ctx.lineTo(width, y);
+              ctx.stroke();
+            }
+
+            for (let i = 0; i <= 10; i++) {
+              const x = (i / 10) * width;
+              ctx.beginPath();
+              ctx.moveTo(x, 0);
+              ctx.lineTo(x, height);
+              ctx.stroke();
+            }
+
+            ctx.beginPath();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#3B82F6";
+
+            const visibleData = data.slice(
+              offset,
+              offset + Math.floor(100 / zoom)
+            );
+
+            visibleData.forEach((point, i) => {
+              const x = (i / (visibleData.length - 1)) * width;
+              const y = height - ((point - min) / range) * height;
+
+              if (i === 0) {
+                ctx.moveTo(x, y);
+              } else {
+                ctx.lineTo(x, y);
+              }
+            });
+
+            ctx.stroke();
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, "rgba(59, 130, 246, 0.3)");
+            gradient.addColorStop(1, "rgba(59, 130, 246, 0)");
+
+            ctx.beginPath();
+            ctx.moveTo(0, height);
+            visibleData.forEach((point, i) => {
+              const x = (i / (visibleData.length - 1)) * width;
+              const y = height - ((point - min) / range) * height;
+              ctx.lineTo(x, y);
+            });
+            ctx.lineTo(width, height);
+            ctx.closePath();
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            ctx.fillStyle = "#3B82F6";
+            visibleData.forEach((point, i) => {
+              if (i % 5 === 0) {
+                const x = (i / (visibleData.length - 1)) * width;
+                const y = height - ((point - min) / range) * height;
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fill();
+              }
+            });
+          };
+
+          const handleResize = () => {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            drawGraph();
+          };
+
+          handleResize();
+          window.addEventListener("resize", handleResize);
+
+          return () => {
+            window.removeEventListener("resize", handleResize);
+          };
+        }, [zoom, offset]);
+
+        const handleZoomIn = () => {
+          setZoom((prev) => Math.min(prev + 0.2, 3));
+        };
+
+        const handleZoomOut = () => {
+          setZoom((prev) => Math.max(prev - 0.2, 0.5));
+        };
+
+        const handlePanLeft = () => {
+          setOffset((prev) => Math.min(prev + 10, 100));
+        };
+
+        const handlePanRight = () => {
+          setOffset((prev) => Math.max(prev - 10, 0));
+        };
+
+        return (
+          <div
+            className={`graph-container ${
+              isExpanded ? "fixed top-0 left-0 w-full h-full z-50" : ""
+            }`}
+          >
+            {isExpanded && (
+              <div className="absolute top-4 left-4 z-10">
+                <button
+                  onClick={onToggleExpand}
+                  className="zoom-btn"
+                  title="Close expanded view"
+                >
+                  <i className="fa-solid fa-compress"></i>
+                </button>
+              </div>
+            )}
+
+            <canvas ref={canvasRef} className="w-full h-full"></canvas>
+
+            <div className="zoom-controls">
+              <button
+                className="zoom-btn"
+                onClick={handleZoomIn}
+                title="Zoom In"
+              >
+                <i className="fa-solid fa-plus"></i>
+              </button>
+              <button
+                className="zoom-btn"
+                onClick={handleZoomOut}
+                title="Zoom Out"
+              >
+                <i className="fa-solid fa-minus"></i>
+              </button>
+              <button
+                className="zoom-btn"
+                onClick={handlePanLeft}
+                title="Pan Left"
+              >
+                <i className="fa-solid fa-arrow-left"></i>
+              </button>
+              <button
+                className="zoom-btn"
+                onClick={handlePanRight}
+                title="Pan Right"
+              >
+                <i className="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+
+            <div className="absolute top-4 left-4">
+              <h4 className="text-sm font-semibold">USDC Trading Volume</h4>
+              <p className="text-xs text-gray-400">Last 24 hours</p>
+            </div>
+            <div className="absolute bottom-4 right-4 flex space-x-4">
+              <div className="text-right">
+                <p className="text-xs text-gray-400">Current</p>
+                <p className="text-sm font-semibold">$1.00</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-gray-400">Volume</p>
+                <p className="text-sm font-semibold">$12.4M</p>
+              </div>
+            </div>
+
+            {isExpanded && (
+              <div className="absolute bottom-4 left-4">
+                <p className="text-xs text-gray-400">
+                  Use zoom and pan controls to explore data
+                </p>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      function PremiumUpgradeModal({ onUpgrade, onClose, show }) {
+        if (!show) return null;
+
+        return (
+          <div className="premium-overlay">
+            <div className="premium-modal">
+              <div className="premium-icon">
+                <i className="fa-solid fa-crown"></i>
+              </div>
+              <h2 className="text-2xl font-bold mb-2">Upgrade to Premium</h2>
+              <p className="text-slate-300 mb-6">
+                Unlock premium features for $299.99 per month
+              </p>
+
+              <div className="glass-light rounded-xl p-4 mb-6">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-slate-300">Monthly Access</span>
+                  <span className="font-bold text-lg">$299.99</span>
+                </div>
+                <div className="text-xs text-slate-400 text-left space-y-1">
+                  <div className="flex items-center">
+                    <i className="fa-solid fa-check text-emerald-400 mr-2"></i>
+                    <span>Unlimited transactions</span>
+                  </div>
+                  <div className="flex items-center">
+                    <i className="fa-solid fa-check text-emerald-400 mr-2"></i>
+                    <span>Priority AI execution</span>
+                  </div>
+                  <div className="flex items-center">
+                    <i className="fa-solid fa-check text-emerald-400 mr-2"></i>
+                    <span>Advanced analytics</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex space-x-3">
+                <Button3D
+                  onClick={onUpgrade}
+                  className="flex-1 text-white py-3"
+                >
+                  <i className="fa-brands fa-ethereum"></i>
+                  <span>Pay with Crypto</span>
+                </Button3D>
+                <button
+                  onClick={onClose}
+                  className="px-4 py-3 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <div className="text-xs text-slate-500 mt-4">
+                Powered by X402 Protocol • Pay as you go
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function LandingPage({ onGetStarted }) {
+        return (
+          <div className="landing-container fade-in">
+            <div className="max-w-4xl mx-auto">
+              <div className="mb-12">
+                <div className="p-4 rounded-xl glass-light inline-block pulse mb-6">
+                  <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                    <i className="fa-solid fa-bolt text-white text-2xl"></i>
+                  </div>
+                </div>
+
+                <h1 className="text-5xl font-bold mb-6">
+                  <span className="logo-text">SmartAid</span>
+                  <span className="text-slate-300 mono"> UPI</span>
+                </h1>
+
+                <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-10">
+                  AI-powered conditional payments for crisis relief. Automate
+                  aid distribution based on real-world events and triggers.
+                </p>
+
+                <Button3D
+                  onClick={onGetStarted}
+                  className="text-white px-8 py-4 text-lg"
+                >
+                  <i className="fa-solid fa-rocket"></i>
+                  <span>Get Started</span>
+                </Button3D>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                {[
+                  {
+                    icon: (
+                      <i className="fa-solid fa-shield-halved text-3xl text-blue-400"></i>
+                    ),
+                    title: "Secure & Transparent",
+                    description:
+                      "Blockchain-powered transactions with full audit trails and immutability.",
+                  },
+                  {
+                    icon: (
+                      <i className="fa-solid fa-bolt-lightning text-3xl text-blue-400"></i>
+                    ),
+                    title: "Instant Execution",
+                    description:
+                      "AI-triggered payments that execute immediately when conditions are met.",
+                  },
+                  {
+                    icon: (
+                      <i className="fa-solid fa-chart-line text-3xl text-blue-400"></i>
+                    ),
+                    title: "Real-time Analytics",
+                    description:
+                      "Monitor all transactions and market conditions in real-time.",
+                  },
+                ].map((feature, index) => (
+                  <div
+                    key={index}
+                    className="feature-card glass rounded-xl p-6 text-center"
+                  >
+                    <div className="mb-4">{feature.icon}</div>
+                    <h3 className="text-xl font-semibold mb-3">
+                      {feature.title}
+                    </h3>
+                    <p className="text-slate-400">{feature.description}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="glass rounded-xl p-8 max-w-3xl mx-auto">
+                <h2 className="text-2xl font-semibold mb-6 text-center">
+                  How It Works
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  {[
+                    { step: "1", title: "Connect", desc: "Link your wallet" },
+                    {
+                      step: "2",
+                      title: "Schedule",
+                      desc: "Set payment conditions",
+                    },
+                    {
+                      step: "3",
+                      title: "Monitor",
+                      desc: "AI watches for triggers",
+                    },
+                    {
+                      step: "4",
+                      title: "Execute",
+                      desc: "Automatic payment delivery",
+                    },
+                  ].map((item, index) => (
+                    <div key={index} className="text-center">
+                      <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mx-auto mb-3">
+                        <span className="font-bold">{item.step}</span>
+                      </div>
+                      <h4 className="font-semibold mb-1">{item.title}</h4>
+                      <p className="text-sm text-slate-400">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function DashboardPage({
+        wallet,
+        schedules,
+        onSchedulePayment,
+        onTriggerPayments,
+        onViewTransaction,
+        onViewExpandedGraph,
+        onUpgradeToPremium,
+      }) {
+        return (
+          <div className="min-h-screen relative">
+            <div className="relative z-20 max-w-7xl mx-auto px-6 py-8 space-y-8 page-transition active">
+              <div className="data-grid">
+                <StatCard
+                  title="Total Balance"
+                  value={`$${wallet.balance.toLocaleString()}`}
+                  change="+2.4%"
+                  icon={<i className="fa-solid fa-wallet text-blue-400"></i>}
+                />
+                <StatCard
+                  title="Scheduled"
+                  value={`$${schedules
+                    .reduce(
+                      (acc, s) => acc + (s.status === "pending" ? s.amount : 0),
+                      0
+                    )
+                    .toLocaleString()}`}
+                  change="+5.2%"
+                  icon={<i className="fa-regular fa-clock text-blue-400"></i>}
+                />
+                <StatCard
+                  title="Transactions"
+                  value={wallet.history.length}
+                  change="+8.3%"
+                  icon={
+                    <i className="fa-solid fa-wave-square text-blue-400"></i>
+                  }
+                />
+                <StatCard
+                  title="Network"
+                  value="Ethereum"
+                  icon={
+                    <i className="fa-solid fa-network-wired text-blue-400"></i>
+                  }
+                />
+              </div>
+
+              <div className="dashboard-grid gap-6">
+                <Card3D className="col-span-7 p-6">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="p-3 rounded-lg bg-blue-500/10">
+                      <i className="fa-regular fa-clock text-blue-400"></i>
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-semibold text-slate-100">
+                        Schedule Payment
+                      </h2>
+                      <p className="text-slate-400 text-sm">
+                        AI-powered conditional transfers
+                      </p>
+                    </div>
+                  </div>
+
+                  <SchedulePaymentForm
+                    onSubmit={onSchedulePayment}
+                    walletBalance={wallet.balance}
+                    onUpgrade={onUpgradeToPremium}
+                  />
+                </Card3D>
+
+                <Card3D className="col-span-5 p-6">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="p-3 rounded-lg bg-blue-500/10">
+                      <i className="fa-solid fa-wallet text-blue-400"></i>
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-semibold text-slate-100">
+                        Wallet
+                      </h2>
+                      <p className="text-slate-400 text-sm">
+                        Balance & transactions
+                      </p>
+                    </div>
+                  </div>
+
+                  <WalletInfo
+                    wallet={wallet}
+                    onViewTransaction={onViewTransaction}
+                  />
+                </Card3D>
+
+                <Card3D className="col-span-12 p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-3 rounded-lg bg-blue-500/10">
+                        <i className="fa-regular fa-clock text-blue-400"></i>
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-semibold text-slate-100">
+                          Scheduled Payments
+                        </h2>
+                        <p className="text-slate-400 text-sm">
+                          Conditional crypto transfers
+                        </p>
+                      </div>
+                    </div>
+
+                    <Button3D
+                      onClick={onTriggerPayments}
+                      className="text-white font-medium text-sm"
+                    >
+                      <i className="fa-solid fa-bolt"></i>
+                      <span>Execute All</span>
+                    </Button3D>
+                  </div>
+
+                  <ScheduledPaymentsList schedules={schedules} />
+                </Card3D>
+
+                <Card3D className="col-span-8 p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-3 rounded-lg bg-blue-500/10">
+                        <i className="fa-solid fa-chart-line text-blue-400"></i>
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-semibold text-slate-100">
+                          Trading Analytics
+                        </h2>
+                        <p className="text-slate-400 text-sm">
+                          Real-time market data
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={onViewExpandedGraph}
+                        className="zoom-btn"
+                        title="Expand graph"
+                      >
+                        <i className="fa-solid fa-expand"></i>
+                      </button>
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full pulse"></div>
+                      <span className="text-emerald-300 text-sm font-medium mono">
+                        LIVE
+                      </span>
+                    </div>
+                  </div>
+
+                  <TradingGraph
+                    isExpanded={false}
+                    onToggleExpand={onViewExpandedGraph}
+                  />
+                </Card3D>
+
+                <Card3D className="col-span-4 p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-3 rounded-lg bg-blue-500/10">
+                        <i className="fa-solid fa-wallet text-blue-400"></i>
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-semibold text-slate-100">
+                          Live Integration
+                        </h2>
+                        <p className="text-slate-400 text-sm">
+                          Coinbase wallet connectivity
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full pulse"></div>
+                      <span className="text-emerald-300 text-sm font-medium mono">
+                        LIVE
+                      </span>
+                    </div>
+                  </div>
+
+                  <LiveWalletInfo />
+                </Card3D>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function SchedulePaymentForm({ onSubmit, walletBalance, onUpgrade }) {
+        const [recipient, setRecipient] = useState("");
+        const [amount, setAmount] = useState("");
+        const [condition, setCondition] = useState("");
+        const [loading, setLoading] = useState(false);
+
+        const handleSubmit = async (e) => {
+          e.preventDefault();
+          if (!recipient || !amount || !condition) return;
+
+          const amountNum = parseFloat(amount);
+
+          if (walletBalance < amountNum) {
+            onUpgrade();
+            return;
+          }
+
+          setLoading(true);
+          await onSubmit({ recipient, amount: amountNum, condition });
+
+          setRecipient("");
+          setAmount("");
+          setCondition("");
+          setLoading(false);
+        };
+
+        return (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Recipient Wallet Address
+              </label>
+              <input
+                type="text"
+                className="w-full input-glass rounded-lg p-3 text-slate-100 placeholder-slate-500 mono text-sm"
+                value={recipient}
+                onChange={(e) => setRecipient(e.target.value)}
+                placeholder="0x742d35Cc6634C0532925a3b8D49814A3f77..."
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Amount (USDC)
+                </label>
+                <input
+                  type="number"
+                  className="w-full input-glass rounded-lg p-3 text-slate-100 placeholder-slate-500"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  step="0.01"
+                  min="0.01"
+                  placeholder="100.00"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Trigger Condition
+                </label>
+                <input
+                  type="text"
+                  className="w-full input-glass rounded-lg p-3 text-slate-100 placeholder-slate-500"
+                  value={condition}
+                  onChange={(e) => setCondition(e.target.value)}
+                  placeholder="Rainfall > 50mm"
+                  required
+                />
+              </div>
+            </div>
+
+            <Button3D
+              type="submit"
+              className="w-full text-white py-3 font-medium"
+              loading={loading}
+              disabled={loading}
+            >
+              <i className="fa-solid fa-paper-plane"></i>
+              <span>{loading ? "Scheduling..." : "Schedule Payment"}</span>
+            </Button3D>
+          </form>
+        );
+      }
+
+      function WalletInfo({ wallet, onViewTransaction }) {
+        return (
+          <div className="space-y-6">
+            <div className="text-center p-6 glass-strong rounded-xl">
+              <p className="text-slate-400 text-sm mb-2 uppercase tracking-wider">
+                Total Balance
+              </p>
+              <p className="text-3xl font-bold text-slate-100 mb-2 mono">
+                ${wallet.balance.toLocaleString()}
+              </p>
+              <p className="text-slate-300 text-md font-medium">USDC</p>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-md font-semibold text-slate-200 flex items-center">
+                <i className="fa-solid fa-chart-line mr-2"></i>
+                <span>Recent Activity</span>
+              </h3>
+
+              {wallet.history.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full glass-light flex items-center justify-center floating">
+                    <i className="fa-solid fa-wallet text-slate-400"></i>
+                  </div>
+                  <p className="text-slate-400 text-sm">No transactions yet</p>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {wallet.history.map((tx) => (
+                    <div
+                      key={tx.id}
+                      className="glass-light rounded-lg p-3 hover:bg-slate-700/20 transition-all cursor-pointer"
+                      onClick={() => onViewTransaction(tx)}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="text-slate-100 font-medium mono text-sm">
+                            <span
+                              className={`transaction-dot ${
+                                tx.status === "completed"
+                                  ? "bg-green-500"
+                                  : tx.status === "pending"
+                                  ? "bg-yellow-500"
+                                  : "bg-red-500"
+                              }`}
+                            ></span>
+                            {tx.amount} USDC
+                          </p>
+                          <p className="text-slate-400 text-xs mono">
+                            {tx.recipient.slice(0, 8)}...
+                            {tx.recipient.slice(-6)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-slate-400 text-xs">
+                            {new Date(tx.timestamp).toLocaleDateString()}
+                          </p>
+                          <p className="text-slate-500 text-xs mono">
+                            {tx.txId}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      function ScheduledPaymentsList({ schedules }) {
+        const getStatusClass = (status) => {
+          switch (status) {
+            case "completed":
+              return "status-success";
+            case "failed":
+              return "status-failed";
+            default:
+              return "status-pending";
+          }
+        };
+
+        return (
+          <>
+            {schedules.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-24 h-24 mx-auto mb-6 rounded-full glass-strong flex items-center justify-center floating">
+                  <i className="fa-regular fa-clock text-slate-400 text-2xl"></i>
+                </div>
+                <h3 className="text-lg font-semibold text-slate-200 mb-2">
+                  No Scheduled Payments
+                </h3>
+                <p className="text-slate-400 text-sm">
+                  Create your first automated payment above
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Recipient</th>
+                      <th>Amount</th>
+                      <th>Condition</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {schedules.map((s) => (
+                      <tr key={s.id}>
+                        <td className="mono font-medium">#{s.id}</td>
+                        <td className="mono">
+                          {s.recipient.slice(0, 8)}...{s.recipient.slice(-6)}
+                        </td>
+                        <td className="font-medium">{s.amount} USDC</td>
+                        <td>{s.condition}</td>
+                        <td>
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-medium ${getStatusClass(
+                              s.status
+                            )}`}
+                          >
+                            {s.status.charAt(0).toUpperCase() +
+                              s.status.slice(1)}
+                          </span>
+                        </td>
+                        <td>
+                          <button className="text-blue-400 hover:text-blue-300 text-sm font-medium">
+                            View Details
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        );
+      }
+
+      function LiveWalletInfo() {
+        const [realWallet, setRealWallet] = useState(null);
+
+        useEffect(() => {
+          setTimeout(() => {
+            setRealWallet({
+              address: "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7",
+              balance: 12458.32,
+              currency: "USDC",
+              network: "Ethereum Mainnet",
+              status: "connected",
+            });
+          }, 1500);
+        }, []);
+
+        if (realWallet === null) {
+          return (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full glass-strong flex items-center justify-center">
+                  <div className="spinner"></div>
+                </div>
+                <p className="text-slate-400 text-sm">
+                  Establishing secure connection...
+                </p>
+              </div>
+            </div>
+          );
+        }
+
+        if (realWallet.error) {
+          return (
+            <div className="glass bg-red-500/5 border border-red-500/10 rounded-xl p-6">
+              <div className="flex items-center space-x-3 mb-3">
+                <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
+                  <i className="fa-solid fa-triangle-exclamation text-red-400"></i>
+                </div>
+                <div>
+                  <h3 className="text-red-300 font-semibold">
+                    Connection Error
+                  </h3>
+                  <p className="text-red-400 text-sm">{realWallet.error}</p>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <div className="space-y-4">
+            <div className="glass-strong rounded-xl p-4">
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-slate-400">Address</span>
+                <span className="mono text-sm text-slate-300">
+                  {realWallet.address.slice(0, 8)}...
+                  {realWallet.address.slice(-6)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-slate-400">Balance</span>
+                <span className="font-medium">
+                  {realWallet.balance} {realWallet.currency}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-400">Network</span>
+                <span className="text-sm text-slate-300">
+                  {realWallet.network}
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-slate-900/80 rounded-xl p-4 mono text-sm border border-slate-700/50">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-slate-400">Status:</span>
+                <span className="text-emerald-400">Connected</span>
+              </div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-slate-400">Last sync:</span>
+                <span className="text-slate-300">Just now</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-400">Block:</span>
+                <span className="text-slate-300">#15463287</span>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function App() {
+        const [activeTab, setActiveTab] = useState("landing");
+        const [wallet, setWallet] = useState({
+          balance: 20000,
+          history: [
+            {
+              id: 1,
+              amount: 2500,
+              recipient: "0x742d35Cc6634C0532925a3b8D49814A3f77",
+              status: "completed",
+              timestamp: new Date(Date.now() - 86400000).toISOString(),
+              txId: "0x8a3f7e...c2d4",
+            },
+            {
+              id: 2,
+              amount: 5000,
+              recipient: "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7",
+              status: "pending",
+              timestamp: new Date(Date.now() - 172800000).toISOString(),
+              txId: "0x5b2c43...e7a9",
+            },
+          ],
+        });
+        const [schedules, setSchedules] = useState([
+          {
+            id: 1,
+            recipient: "0x742d35Cc6634C0532925a3b8D49814A3f77",
+            amount: 2500,
+            condition: "Rainfall > 50mm",
+            status: "pending",
+          },
+          {
+            id: 2,
+            recipient: "0x7a94A5dC27B5A2aD7a44E407D0F75fA7F5A9c2d4",
+            amount: 5000,
+            condition: "Temperature < 0°C",
+            status: "pending",
+          },
+        ]);
+        const [selectedTransaction, setSelectedTransaction] = useState(null);
+        const [metamaskAccount, setMetamaskAccount] = useState(null);
+        const [walletConnected, setWalletConnected] = useState(false);
+        const [notifications, setNotifications] = useState([]);
+        const [showExpandedGraph, setShowExpandedGraph] = useState(false);
+        const [showConfetti, setShowConfetti] = useState(false);
+        const [showPremiumModal, setShowPremiumModal] = useState(false);
+
+        useEffect(() => {
+          if (window.ethereum && window.ethereum.selectedAddress) {
+            setMetamaskAccount(window.ethereum.selectedAddress);
+          }
+        }, []);
+
+        const addNotification = (type, title, message) => {
+          const id = Date.now();
+          setNotifications((prev) => [...prev, { id, type, title, message }]);
+
+          setTimeout(() => {
+            setNotifications((prev) => prev.filter((n) => n.id !== id));
+          }, 5000);
+        };
+
+        const removeNotification = (id) => {
+          setNotifications((prev) => prev.filter((n) => n.id !== id));
+        };
+
+        const handleSchedulePayment = async ({
+          recipient,
+          amount,
+          condition,
+        }) => {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              const newSchedule = {
+                id: schedules.length + 1,
+                recipient,
+                amount: parseFloat(amount),
+                condition,
+                status: "pending",
+              };
+
+              setSchedules((prev) => [...prev, newSchedule]);
+
+              const newTransaction = {
+                id: wallet.history.length + 1,
+                amount: parseFloat(amount),
+                recipient,
+                status: "pending",
+                timestamp: new Date().toISOString(),
+                txId:
+                  "0x" +
+                  Math.random().toString(16).slice(2, 10) +
+                  "..." +
+                  Math.random().toString(16).slice(2, 6),
+              };
+
+              setWallet((prev) => ({
+                ...prev,
+                history: [newTransaction, ...prev.history],
+                balance: prev.balance - parseFloat(amount),
+              }));
+
+              addNotification(
+                "info",
+                "Payment Scheduled",
+                `Scheduled ${amount} USDC to ${recipient.slice(0, 8)}...`
+              );
+
+              resolve();
+            }, 1000);
+          });
+        };
+
+        const handleTriggerPayments = async () => {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              const totalAmount = schedules
+                .filter((s) => s.status === "pending")
+                .reduce((sum, s) => sum + s.amount, 0);
+
+              if (wallet.balance < totalAmount) {
+                setShowPremiumModal(true);
+                resolve();
+                return;
+              }
+
+              const updatedSchedules = schedules.map((s) =>
+                s.status === "pending" ? { ...s, status: "completed" } : s
+              );
+
+              setSchedules(updatedSchedules);
+
+              const updatedHistory = wallet.history.map((t) =>
+                t.status === "pending" ? { ...t, status: "completed" } : t
+              );
+
+              setWallet((prev) => ({
+                ...prev,
+                history: updatedHistory,
+                balance: prev.balance - totalAmount,
+              }));
+
+              addNotification(
+                "success",
+                "Payments Executed",
+                `Successfully executed ${
+                  schedules.filter((s) => s.status === "pending").length
+                } payments`
+              );
+
+              setShowConfetti(true);
+              setTimeout(() => setShowConfetti(false), 5000);
+
+              resolve();
+            }, 2000);
+          });
+        };
+
+        const handleViewTransaction = (transaction) => {
+          setSelectedTransaction(transaction);
+        };
+
+        const handleViewExpandedGraph = () => {
+          setShowExpandedGraph(true);
+        };
+
+        const handleCloseExpandedGraph = () => {
+          setShowExpandedGraph(false);
+        };
+
+        const connectMetamask = async () => {
+          setWalletConnected(true);
+
+          setTimeout(() => {
+            setMetamaskAccount("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7");
+
+            addNotification(
+              "success",
+              "Wallet Connected",
+              "Your MetaMask wallet has been connected successfully"
+            );
+
+            setTimeout(() => {
+              setWalletConnected(false);
+            }, 3000);
+          }, 800);
+        };
+
+        const disconnectMetamask = () => {
+          setMetamaskAccount(null);
+
+          addNotification(
+            "info",
+            "Wallet Disconnected",
+            "Your MetaMask wallet has been disconnected"
+          );
+        };
+
+        const handleGetStarted = () => {
+          setActiveTab("dashboard");
+        };
+
+        const handleTabChange = (tab) => {
+          setActiveTab(tab);
+        };
+
+        const handleUpgradeToPremium = () => {
+          setShowPremiumModal(true);
+        };
+
+        const handlePremiumPayment = () => {
+          setWallet((prev) => ({ ...prev, balance: prev.balance + 20000 }));
+          setShowPremiumModal(false);
+
+          addNotification(
+            "success",
+            "Premium Activated",
+            "Your account has been upgraded to premium for 30 days"
+          );
+        };
+
+        const handleClosePremiumModal = () => {
+          setShowPremiumModal(false);
+        };
+
+        return (
+          <div className="min-h-screen relative">
+            {showConfetti && <ConfettiAnimation />}
+
+            {notifications.map((notification) => (
+              <Notification
+                key={notification.id}
+                type={notification.type}
+                title={notification.title}
+                message={notification.message}
+                onClose={() => removeNotification(notification.id)}
+              />
+            ))}
+
+            {selectedTransaction && (
+              <TransactionModal
+                transaction={selectedTransaction}
+                onClose={() => setSelectedTransaction(null)}
+              />
+            )}
+
+            {showExpandedGraph && (
+              <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center p-4">
+                <TradingGraph
+                  isExpanded={true}
+                  onToggleExpand={handleCloseExpandedGraph}
+                />
+              </div>
+            )}
+
+            <PremiumUpgradeModal
+              onUpgrade={handlePremiumPayment}
+              onClose={handleClosePremiumModal}
+              show={showPremiumModal}
+            />
+
+            {activeTab !== "landing" && (
+              <header className="flex justify-between items-center py-6 max-w-7xl mx-auto px-6">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 rounded-xl glass-light pulse">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                      <i className="fa-solid fa-bolt text-white"></i>
+                    </div>
+                  </div>
+
+                  <h1 className="text-3xl font-bold">
+                    <span className="logo-text">SmartAid</span>
+                    <span className="text-slate-300 mono"> UPI</span>
+                  </h1>
+                </div>
+
+                <nav className="flex space-x-1 glass-light rounded-lg p-1">
+                  {["dashboard", "payments", "analytics", "settings"].map(
+                    (tab) => (
+                      <button
+                        key={tab}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                          activeTab === tab
+                            ? "bg-blue-500 text-white"
+                            : "text-slate-300 hover:text-white"
+                        }`}
+                        onClick={() => handleTabChange(tab)}
+                      >
+                        {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                      </button>
+                    )
+                  )}
+                </nav>
+
+                <div className="flex items-center space-x-4">
+                  {metamaskAccount ? (
+                    <div className="glass-light rounded-full px-4 py-2 flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full pulse"></div>
+                      <span className="text-slate-200 font-medium mono text-sm">
+                        {metamaskAccount.substring(0, 6)}…
+                        {metamaskAccount.slice(-4)}
+                      </span>
+                      <button
+                        onClick={disconnectMetamask}
+                        className="text-slate-400 hover:text-slate-200"
+                        title="Disconnect Wallet"
+                      >
+                        <i className="fa-solid fa-power-off text-xs"></i>
+                      </button>
+                    </div>
+                  ) : (
+                    <Button3D
+                      onClick={connectMetamask}
+                      className="text-white font-medium text-sm"
+                      loading={walletConnected}
+                    >
+                      {walletConnected ? (
+                        <>
+                          <div className="spinner"></div>
+                          <span>Connecting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <i className="fa-solid fa-wallet"></i>
+                          <span>Connect Wallet</span>
+                        </>
+                      )}
+                    </Button3D>
+                  )}
+                </div>
+              </header>
+            )}
+
+            {activeTab === "landing" && (
+              <LandingPage onGetStarted={handleGetStarted} />
+            )}
+
+            {activeTab === "dashboard" && (
+              <DashboardPage
+                wallet={wallet}
+                schedules={schedules}
+                onSchedulePayment={handleSchedulePayment}
+                onTriggerPayments={handleTriggerPayments}
+                onViewTransaction={handleViewTransaction}
+                onViewExpandedGraph={handleViewExpandedGraph}
+                onUpgradeToPremium={handleUpgradeToPremium}
+              />
+            )}
+
+            {activeTab === "payments" && (
+              <div className="max-w-7xl mx-auto px-6 py-8 page-transition active">
+                <Card3D className="p-8">
+                  <div className="flex items-center space-x-3 mb-8">
+                    <div className="p-3 rounded-lg bg-blue-500/10">
+                      <i className="fa-solid fa-credit-card text-blue-400 text-xl"></i>
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-semibold text-slate-100">
+                        Payment Management
+                      </h2>
+                      <p className="text-slate-400">
+                        View and manage all your payments
+                      </p>
+                    </div>
+                  </div>
+
+                  <ScheduledPaymentsList schedules={schedules} />
+                </Card3D>
+              </div>
+            )}
+
+            {activeTab === "analytics" && (
+              <div className="max-w-7xl mx-auto px-6 py-8 page-transition active">
+                <Card3D className="p-8">
+                  <div className="flex items-center space-x-3 mb-8">
+                    <div className="p-3 rounded-lg bg-blue-500/10">
+                      <i className="fa-solid fa-chart-pie text-blue-400 text-xl"></i>
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-semibold text-slate-100">
+                        Advanced Analytics
+                      </h2>
+                      <p className="text-slate-400">
+                        Detailed insights into your transactions
+                      </p>
+                    </div>
+                  </div>
+
+                  <TradingGraph
+                    isExpanded={false}
+                    onToggleExpand={handleViewExpandedGraph}
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                    <Card3D className="p-6">
+                      <h3 className="text-lg font-semibold mb-4">
+                        Transaction History
+                      </h3>
+                      <div className="space-y-4">
+                        {wallet.history.slice(0, 5).map((tx) => (
+                          <div
+                            key={tx.id}
+                            className="flex justify-between items-center"
+                          >
+                            <div className="flex items-center">
+                              <div
+                                className={`w-3 h-3 rounded-full mr-3 ${
+                                  tx.status === "completed"
+                                    ? "bg-green-500"
+                                    : "bg-yellow-500"
+                                }`}
+                              ></div>
+                              <div>
+                                <p className="text-sm font-medium">Transfer</p>
+                                <p className="text-xs text-slate-400">
+                                  {new Date(tx.timestamp).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-medium">{tx.amount} USDC</p>
+                              <p className="text-xs text-slate-400">
+                                {tx.status}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </Card3D>
+
+                    <Card3D className="p-6">
+                      <h3 className="text-lg font-semibold mb-4">
+                        Spending Overview
+                      </h3>
+                      <div className="space-y-4">
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-sm">Scheduled Payments</span>
+                            <span className="text-sm font-medium">
+                              $
+                              {schedules
+                                .reduce((acc, s) => acc + s.amount, 0)
+                                .toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="w-full bg-slate-700 rounded-full h-2">
+                            <div
+                              className="bg-blue-500 h-2 rounded-full"
+                              style={{ width: "65%" }}
+                            ></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-sm">
+                              Completed Transactions
+                            </span>
+                            <span className="text-sm font-medium">
+                              $
+                              {wallet.history
+                                .filter((t) => t.status === "completed")
+                                .reduce((acc, t) => acc + t.amount, 0)
+                                .toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="w-full bg-slate-700 rounded-full h-2">
+                            <div
+                              className="bg-green-500 h-2 rounded-full"
+                              style={{ width: "80%" }}
+                            ></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-sm">
+                              Pending Transactions
+                            </span>
+                            <span className="text-sm font-medium">
+                              $
+                              {wallet.history
+                                .filter((t) => t.status === "pending")
+                                .reduce((acc, t) => acc + t.amount, 0)
+                                .toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="w-full bg-slate-700 rounded-full h-2">
+                            <div
+                              className="bg-yellow-500 h-2 rounded-full"
+                              style={{ width: "30%" }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    </Card3D>
+                  </div>
+                </Card3D>
+              </div>
+            )}
+
+            {activeTab === "settings" && (
+              <div className="max-w-7xl mx-auto px-6 py-8 page-transition active">
+                <Card3D className="p-8">
+                  <div className="flex items-center space-x-3 mb-8">
+                    <div className="p-3 rounded-lg bg-blue-500/10">
+                      <i className="fa-solid fa-gear text-blue-400 text-xl"></i>
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-semibold text-slate-100">
+                        Settings
+                      </h2>
+                      <p className="text-slate-400">
+                        Configure your SmartAid UPI experience
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-semibold">
+                        Account Settings
+                      </h3>
+
+                      <div className="space-y-4">
+                        <div className="glass-light rounded-xl p-4">
+                          <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Wallet Address
+                          </label>
+                          <div className="mono text-sm p-2 bg-slate-800 rounded">
+                            {metamaskAccount || "Not connected"}
+                          </div>
+                        </div>
+
+                        <div className="glass-light rounded-xl p-4">
+                          <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Network
+                          </label>
+                          <div className="text-sm p-2 bg-slate-800 rounded">
+                            Ethereum Mainnet
+                          </div>
+                        </div>
+
+                        <div className="glass-light rounded-xl p-4">
+                          <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Currency
+                          </label>
+                          <div className="text-sm p-2 bg-slate-800 rounded">
+                            USDC (Stablecoin)
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-semibold">Preferences</h3>
+
+                      <div className="space-y-4">
+                        <div className="glass-light rounded-xl p-4 flex justify-between items-center">
+                          <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-1">
+                              Email Notifications
+                            </label>
+                            <p className="text-xs text-slate-400">
+                              Get alerts for transactions
+                            </p>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              className="sr-only peer"
+                              defaultChecked
+                            />
+                            <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                          </label>
+                        </div>
+
+                        <div className="glass-light rounded-xl p-4 flex justify-between items-center">
+                          <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-1">
+                              SMS Notifications
+                            </label>
+                            <p className="text-xs text-slate-400">
+                              Get text alerts for important events
+                            </p>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" className="sr-only peer" />
+                            <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                          </label>
+                        </div>
+
+                        <div className="glass-light rounded-xl p-4 flex justify-between items-center">
+                          <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-1">
+                              Auto-Execute Payments
+                            </label>
+                            <p className="text-xs text-slate-400">
+                              Automatically trigger payments when conditions are
+                              met
+                            </p>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              className="sr-only peer"
+                              defaultChecked
+                            />
+                            <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 pt-8 border-t border-slate-700">
+                    <h3 className="text-lg font-semibold mb-4">Danger Zone</h3>
+
+                    <div className="glass bg-red-500/5 border border-red-500/10 rounded-xl p-4 flex justify-between items-center">
+                      <div>
+                        <label className="block text-sm font-medium text-red-300 mb-1">
+                          Delete All Data
+                        </label>
+                        <p className="text-xs text-red-400/70">
+                          Permanently remove all your transactions and schedules
+                        </p>
+                      </div>
+                      <button className="px-4 py-2 bg-red-500/20 text-red-300 rounded-lg text-sm hover:bg-red-500/30 transition-colors">
+                        Delete Everything
+                      </button>
+                    </div>
+                  </div>
+                </Card3D>
+              </div>
+            )}
+
+            {activeTab !== "landing" && (
+              <footer className="text-center py-12 space-y-6 border-t border-slate-800 mt-12 max-w-7xl mx-auto px-6">
+                <div className="flex justify-center items-center space-x-8 mb-6">
+                  {[
+                    {
+                      icon: <i className="fa-solid fa-shield-halved"></i>,
+                      label: "Quantum Secured",
+                      desc: "Military-grade encryption",
+                    },
+                    {
+                      icon: <i className="fa-solid fa-bolt"></i>,
+                      label: "Lightning Fast",
+                      desc: "Sub-second execution",
+                    },
+                    {
+                      icon: <i className="fa-solid fa-chart-line"></i>,
+                      label: "99.9% Uptime",
+                      desc: "Enterprise reliability",
+                    },
+                  ].map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col items-center space-y-2 group"
+                    >
+                      <div className="p-3 rounded-lg glass-light group-hover:bg-slate-700/30 transition-all pulse">
+                        {item.icon}
+                      </div>
+                      <div className="text-center">
+                        <p className="text-slate-200 font-medium text-sm">
+                          {item.label}
+                        </p>
+                        <p className="text-slate-400 text-xs">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-slate-400 mono text-sm">
+                    Prototype for{" "}
+                    <span className="text-slate-200 font-medium">
+                      Innovate‑A‑Thon 3.0
+                    </span>
+                  </p>
+                  <p className="text-slate-500 text-xs">
+                    Revolutionary crisis relief technology • Testnet deployment
+                  </p>
+                </div>
+
+                <div className="flex justify-center space-x-6 pt-4">
+                  {["Documentation", "Security", "API", "GitHub"].map(
+                    (link, i) => (
+                      <a
+                        key={i}
+                        href="#"
+                        className="text-slate-500 hover:text-slate-300 text-xs transition-colors mono"
+                      >
+                        {link}
+                      </a>
+                    )
+                  )}
+                </div>
+              </footer>
+            )}
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>
